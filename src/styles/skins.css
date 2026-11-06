@@ -1,0 +1,85 @@
+/* Skin palettes. Every visual token lives here so a skin is just a set of variables. */
+
+body[data-skin='chrome-blue'] {
+  --page-bg: radial-gradient(120% 90% at 50% 0%, #1b3a7a 0%, #08142e 45%, #02050d 100%);
+  --page-stripe: rgba(80, 140, 255, 0.06);
+  --chrome-hi: #f4f8ff;
+  --chrome-mid: #b5c3da;
+  --chrome-lo: #6d7d98;
+  --chrome-edge: #2c3850;
+  --chrome-text: #0e1a33;
+  --chrome-text-soft: #41506e;
+  --accent: #39a2ff;
+  --accent-hi: #b8e4ff;
+  --accent-deep: #0a3c9c;
+  --lcd-bg: #031028;
+  --lcd-bg2: #072052;
+  --lcd-fg: #8fdcff;
+  --lcd-dim: #1f4a7a;
+  --lcd-glow: rgba(120, 210, 255, 0.55);
+  --viz-low: #3ad0ff;
+  --viz-mid: #9cf3ff;
+  --viz-high: #ffffff;
+  --viz-off: #0a1f40;
+  --viz-peak: #ffffff;
+  --orb-a: #d9f0ff;
+  --orb-b: #2a8cff;
+  --orb-c: #021a55;
+  --key-lit: #ff9a1f;
+}
+
+body[data-skin='toxic-green'] {
+  --page-bg: radial-gradient(120% 90% at 50% 0%, #27411a 0%, #0b1408 45%, #030502 100%);
+  --page-stripe: rgba(160, 255, 40, 0.05);
+  --chrome-hi: #eef2ea;
+  --chrome-mid: #a7b0a3;
+  --chrome-lo: #5c6559;
+  --chrome-edge: #242a22;
+  --chrome-text: #142010;
+  --chrome-text-soft: #3e4c38;
+  --accent: #9dff1f;
+  --accent-hi: #e6ffb0;
+  --accent-deep: #2f6a00;
+  --lcd-bg: #061000;
+  --lcd-bg2: #0f2402;
+  --lcd-fg: #b8ff4a;
+  --lcd-dim: #2c4a10;
+  --lcd-glow: rgba(170, 255, 60, 0.5);
+  --viz-low: #6dff2a;
+  --viz-mid: #e4ff3a;
+  --viz-high: #ff4a1a;
+  --viz-off: #0c1d04;
+  --viz-peak: #f0ffd0;
+  --orb-a: #f2ffd4;
+  --orb-b: #7fe014;
+  --orb-c: #1a3a00;
+  --key-lit: #b8ff4a;
+}
+
+body[data-skin='classic-amp'] {
+  --page-bg: linear-gradient(180deg, #24242e 0%, #111117 100%);
+  --page-stripe: rgba(255, 255, 255, 0.025);
+  --chrome-hi: #9696aa;
+  --chrome-mid: #5e5e72;
+  --chrome-lo: #3a3a4a;
+  --chrome-edge: #16161e;
+  --chrome-text: #e8e8f0;
+  --chrome-text-soft: #b0b0c4;
+  --accent: #e2c35a;
+  --accent-hi: #fff0b8;
+  --accent-deep: #6a5210;
+  --lcd-bg: #000000;
+  --lcd-bg2: #0a0a0a;
+  --lcd-fg: #00e000;
+  --lcd-dim: #0a3a0a;
+  --lcd-glow: rgba(0, 230, 0, 0.45);
+  --viz-low: #18c818;
+  --viz-mid: #d8d818;
+  --viz-high: #e02818;
+  --viz-off: #0b160b;
+  --viz-peak: #b0b0b0;
+  --orb-a: #f0f0f0;
+  --orb-b: #8a8aa0;
+  --orb-c: #20202a;
+  --key-lit: #00e000;
+}

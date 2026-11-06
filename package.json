@@ -1,0 +1,20 @@
+{
+  "name": "drumtroller",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "DualSense → MIDI controller in the browser (WebHID + Web MIDI)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/w3c-web-hid": "^1.0.6",
+    "typescript": "~5.6.3",
+    "vite": "^6.0.7",
+    "vitest": "^3.0.4"
+  }
+}

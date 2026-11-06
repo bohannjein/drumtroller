@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Drumtroller</title>
+    <meta name="description" content="DualSense → MIDI im Browser: Tasten, Sticks, Trigger, Gyro und Touchpad als MIDI-Noten und CCs." />
+    <meta name="theme-color" content="#050914" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23e6f4ff'/%3E%3Cstop offset='.5' stop-color='%232a8cff'/%3E%3Cstop offset='1' stop-color='%23021030'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  </head>
+  <body data-skin="chrome-blue">
+    <div class="stage">
+      <main class="unit" id="unit">
+        <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+
+        <!-- title bar -->
+        <header class="titlebar">
+          <span class="tb-orb" aria-hidden="true"></span>
+          <h1 class="tb-title">DRUMTROLLER</h1>
+          <span class="tb-sub">DS·MIDI UNIT 2K</span>
+          <span class="tb-grip" aria-hidden="true"></span>
+          <div class="tb-skins" role="group" aria-label="Skin wählen" id="skinButtons"></div>
+        </header>
+
+        <!-- top: LCD, connect orb, preset keys -->
+        <section class="top">
+          <div class="lcd main-lcd" aria-live="polite">
+            <div class="lcd-row">
+              <span class="lcd-preset" id="lcdPreset">P1</span>
+              <span class="lcd-note" id="lcdNote">-- ---</span>
+              <span class="lcd-batt" id="lcdBatt">BAT --%</span>
+            </div>
+            <div class="lcd-ticker"><span id="ticker">BITTE CONTROLLER ANSCHLIESSEN</span></div>
+            <div class="lcd-row small">
+              <span id="lcdConn">NO CTRL</span>
+              <span id="lcdMidi">MIDI --</span>
+              <span class="midi-led" id="midiLed" title="MIDI-Aktivität"></span>
+            </div>
+          </div>
+
+          <button class="connect-orb" id="connectBtn" type="button" title="Controller über WebHID verbinden (Gyro, Touchpad, Lightbar)">
+            <span class="orb-ring"></span>
+            <span class="orb-core"><span class="orb-label" id="connectLabel">CONNECT</span></span>
+          </button>
+
+          <div class="preset-keys" role="group" aria-label="Presets" id="presetKeys">
+            <button type="button" class="hw-key" data-preset="0">P1</button>
+            <button type="button" class="hw-key" data-preset="1">P2</button>
+            <button type="button" class="hw-key" data-preset="2">P3</button>
+            <button type="button" class="hw-key" data-preset="3">P4</button>
+          </div>
+        </section>
+
+        <!-- middle: slot lists + controller -->
+        <section class="mid">
+          <div class="slots" id="slotsLeft"></div>
+          <div class="bay">
+            <div class="bay-inner" id="controller"></div>
+            <div class="status-line">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="stDevice">KEIN CONTROLLER</span>
+              <button type="button" class="pill" id="inputToggle">INPUT ON</button>
+              <button type="button" class="pill" id="motionToggle">MOTION ON</button>
+            </div>
+          </div>
+          <div class="slots" id="slotsRight"></div>
+        </section>
+
+        <!-- visualisation -->
+        <section class="viz">
+          <div class="lcd analyzer-lcd"><canvas id="analyzer" aria-label="Analyzer aller Achsen"></canvas></div>
+          <div class="radar-wrap">
+            <div class="lcd radar">
+              <svg viewBox="0 0 100 100" aria-label="Gyro-Radar">
+                <circle cx="50" cy="50" r="44" class="rd-ring"/>
+                <circle cx="50" cy="50" r="28" class="rd-ring"/>
+                <circle cx="50" cy="50" r="12" class="rd-ring"/>
+                <path d="M50 4 V96 M4 50 H96" class="rd-cross"/>
+                <line x1="50" y1="50" x2="50" y2="10" class="rd-needle" id="radarNeedle"/>
+                <circle cx="50" cy="50" r="5" class="rd-dot" id="radarDot"/>
+              </svg>
+            </div>
+            <button type="button" class="pill small" id="recenterBtn" title="Gyro zentrieren (auch: CREATE-Taste)">CENTER</button>
+          </div>
+        </section>
+
+        <!-- deck: midi port + toggles + drawer buttons -->
+        <section class="deck">
+          <label class="deck-field">
+            <span class="deck-lbl">MIDI OUT</span>
+            <select id="midiSelect" class="inset-select"><option>--</option></select>
+          </label>
+          <button type="button" class="pill" id="drumMode" title="Velocity aus der Bewegung: Schlag mit dem Controller in die Luft und drück dabei die Taste">DRUM-VEL</button>
+          <span class="deck-spacer"></span>
+          <button type="button" class="drawer-btn" data-drawer="mapDrawer">MAPPINGS ›</button>
+          <button type="button" class="drawer-btn" data-drawer="fxDrawer">FX ›</button>
+          <button type="button" class="drawer-btn" data-drawer="helpDrawer">HILFE ›</button>
+        </section>
+
+        <!-- drawers -->
+        <section class="drawer" id="mapDrawer" hidden>
+          <div class="drawer-head">
+            <span class="drawer-title" id="mapTitle">MAPPINGS · P1</span>
+            <span class="deck-spacer"></span>
+            <button type="button" class="pill small" id="exportBtn">EXPORT</button>
+            <label class="pill small file-pill">IMPORT<input type="file" id="importInput" accept="application/json,.json" hidden /></label>
+            <button type="button" class="pill small warn" id="resetBtn">RESET P</button>
+          </div>
+          <p class="drawer-note">Taste am Controller drücken = Zeile wird markiert. <b>SOLO</b> sendet nur dieses Input, ideal für MIDI-Learn in der DAW. System-Tasten: <b>PS</b> nächstes Preset · <b>MUTE</b> Motion an/aus · <b>CREATE</b> Gyro zentrieren.</p>
+          <div class="pl-list" id="mapList"></div>
+        </section>
+
+        <section class="drawer" id="fxDrawer" hidden>
+          <div class="drawer-head"><span class="drawer-title">CONTROLLER FX</span></div>
+          <div class="fx-grid">
+            <div class="fx-box">
+              <div class="fx-title">LIGHTBAR</div>
+              <label class="fx-row"><input type="checkbox" id="lbFollow" /> Farbe folgt Preset</label>
+              <label class="fx-row">Farbe <input type="color" id="lbColor" value="#ff8000" /></label>
+            </div>
+            <div class="fx-box">
+              <div class="fx-title">RUMBLE</div>
+              <label class="fx-row"><input type="checkbox" id="rumbleHit" /> Kick bei jeder Note</label>
+              <button type="button" class="pill small" id="rumbleTest">TEST</button>
+            </div>
+            <div class="fx-box">
+              <div class="fx-title">L2 TRIGGER</div>
+              <select id="l2Mode" class="inset-select">
+                <option value="off">AUS</option><option value="feedback">WIDERSTAND</option>
+                <option value="weapon">KLICKPUNKT</option><option value="vibration">VIBRATION</option>
+              </select>
+              <label class="fx-row">Stärke <input type="range" id="l2Strength" min="1" max="8" step="1" /></label>
+            </div>
+            <div class="fx-box">
+              <div class="fx-title">R2 TRIGGER</div>
+              <select id="r2Mode" class="inset-select">
+                <option value="off">AUS</option><option value="feedback">WIDERSTAND</option>
+                <option value="weapon">KLICKPUNKT</option><option value="vibration">VIBRATION</option>
+              </select>
+              <label class="fx-row">Stärke <input type="range" id="r2Strength" min="1" max="8" step="1" /></label>
+            </div>
+          </div>
+          <p class="drawer-note">FX brauchen die WebHID-Verbindung (CONNECT). Nur Tasten/Sticks gehen auch ohne.</p>
+        </section>
+
+        <section class="drawer" id="helpDrawer" hidden>
+          <div class="drawer-head"><span class="drawer-title">QUICKSTART</span></div>
+          <ol class="help">
+            <li><b>Chrome oder Edge</b> am Rechner öffnen. Firefox/Safari können kein WebHID.</li>
+            <li>DualSense per <b>USB</b> oder <b>Bluetooth</b> verbinden, dann <b>CONNECT</b> drücken und den Controller auswählen. Beim nächsten Mal verbindet er sich automatisch.</li>
+            <li>MIDI-Port für die DAW:
+              <ul>
+                <li><b>macOS:</b> Audio-MIDI-Setup → MIDI-Studio → <i>IAC-Treiber</i> → „Gerät ist online“.</li>
+                <li><b>Windows:</b> <i>loopMIDI</i> installieren und einen Port anlegen.</li>
+              </ul>
+            </li>
+            <li>Port oben bei <b>MIDI OUT</b> wählen, in der DAW denselben Port als MIDI-Eingang (Track + Remote) aktivieren.</li>
+            <li>P1 ist ein Drum-Rack-Layout ab C1 auf Kanal 1. P2–P4 senden auf Kanal 2–4.</li>
+          </ol>
+        </section>
+
+        <footer class="unit-foot">
+          <span class="grille" aria-hidden="true"></span>
+          <span class="foot-text" id="footText">WEBHID · WEB MIDI · 250 HZ</span>
+          <span class="grille" aria-hidden="true"></span>
+        </footer>
+      </main>
+      <p class="browser-warn" id="browserWarn" hidden></p>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
